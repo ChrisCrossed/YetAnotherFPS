@@ -7,11 +7,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField] int MoveSpeed = 50;
 
     Rigidbody thisRigidBody;
+    GameObject thisCameraObj;
+    Camera thisCamera;
 
     // Start is called before the first frame update
     void Start()
     {
         thisRigidBody = gameObject.GetComponent<Rigidbody>();
+        thisCameraObj = gameObject.transform.Find("Main Camera").gameObject;
+        thisCamera = thisCameraObj.GetComponent<Camera>();
+
+        InitMouse();
+    }
+    void InitMouse()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -21,13 +32,23 @@ public class PlayerController : MonoBehaviour
         Movement();
     }
 
+    float cameraVertAngle;
     void MouseLook()
     {
+        #region Horizontal Mouse Look
         float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
 
         Vector3 lookDir = gameObject.transform.eulerAngles;
         lookDir.y += mouseX;
         gameObject.transform.eulerAngles = lookDir;
+        #endregion
+
+        cameraVertAngle -= mouseY;
+
+        Vector3 cameraEuler = thisCameraObj.transform.eulerAngles;
+        cameraVertAngle = Mathf.Clamp(cameraVertAngle, -85f, 85f);
+        thisCameraObj.transform.eulerAngles = new Vector3(cameraVertAngle, cameraEuler.y, cameraEuler.z);
     }
 
     void Movement()
